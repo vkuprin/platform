@@ -14,7 +14,8 @@
     "_phase:build": "compile transpile src",
     "_phase:test": "jest --passWithNoTests --silent",
     "_phase:format": "format src",
-    "_phase:validate": "compile validate"
+    "_phase:validate": "compile validate",
+    "_phase:lint": "eslint . --ext .ts,.tsx"
   },
   "devDependencies": {
     "@hcengineering/platform-rig": "^0.6.0",

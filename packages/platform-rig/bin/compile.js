@@ -103,6 +103,19 @@ switch (args[0]) {
     })
     break
   }
+  case 'lint': {
+    let st = Date.now()
+    await execProcess(
+      'eslint',
+      'lint',
+      [
+        '--ext', '.ts,.js,.svelte',
+        '--fix',
+        ...args.splice(1)
+      ])
+    console.log("Lint time: ", Date.now() - st)
+    break
+  }
   case 'validate': {
     let st = Date.now()
     validateTSC(st).then(() => {
