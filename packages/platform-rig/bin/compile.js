@@ -103,6 +103,7 @@ switch (args[0]) {
 
   case 'validate':
     validateTSC();
+    lintFiles(args);
     break;
 
   default:
