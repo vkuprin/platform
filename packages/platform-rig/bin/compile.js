@@ -1,4 +1,4 @@
-const { join, dirname, basename } = require("path")
+const { join, basename } = require("path")
 const { readFileSync, existsSync, mkdirSync, createWriteStream, readdirSync, lstatSync, rmSync } = require('fs')
 const { spawn } = require('child_process')
 
@@ -6,7 +6,6 @@ const esbuild = require('esbuild')
 const { copy } = require('esbuild-plugin-copy')
 
 async function execProcess(cmd, logFile, args, buildDir= '.build') {
-  let compileRoot = dirname(dirname(process.argv[1]))
   console.log('Running from',)
   console.log("Compiling...\n", process.cwd(), args)
 
@@ -90,55 +89,51 @@ function collectFiles(source) {
 }
 
 switch (args[0]) {
-  case 'ui': {
-    console.log('Nothing to compile to UI')
-    break
-  }
-  case 'transpile': {
-    const filesToTranspile = collectFiles(join(process.cwd(), args[1]))
-    let st = Date.now()  
-    performESBuild(filesToTranspile)
-    .then(() => {
-      console.log("Transpile time: ", Date.now() - st)
-    })
-    break
-  }
-  case 'lint': {
-    let st = Date.now()
-    await execProcess(
-      'eslint',
-      'lint',
-      [
-        '--ext', '.ts,.js,.svelte',
-        '--fix',
-        ...args.splice(1)
-      ])
-    console.log("Lint time: ", Date.now() - st)
-    break
-  }
-  case 'validate': {
-    let st = Date.now()
-    validateTSC(st).then(() => {
-      console.log("Validate time: ", Date.now() - st)
-    })
-    break
-  }
-  default: {
-    let st = Date.now()
-    const filesToTranspile = collectFiles(join(process.cwd(), 'src'))
-    Promise.all(
-      [
-        performESBuild(filesToTranspile),
-        validateTSC()
-      ]
-    )
-    .then(() => {
-      console.log("Full build time: ", Date.now() - st)
-    })    
-    break
-  }
+  case 'ui':
+    console.log('Nothing to compile for UI');
+    break;
+
+  case 'transpile':
+    transpileFiles(args[1]);
+    break;
+
+  case 'lint':
+    lintFiles(args);
+    break;
+
+  case 'validate':
+    validateTSC();
+    break;
+
+  default:
+    fullBuild();
+    break;
 }
-async function performESBuild(filesToTranspile) {  
+
+async function transpileFiles(directory) {
+  let filesToTranspile = collectFiles(join(process.cwd(), directory));
+  let startTime = Date.now();
+  await performESBuild(filesToTranspile);
+  console.log("Transpile time: ", Date.now() - startTime);
+}
+
+async function lintFiles(args) {
+  let startTime = Date.now();
+  await execProcess('eslint', 'lint-output', ['--ext', '.ts,.js,.svelte', '--fix', ...args.slice(1)]);
+  console.log("Lint time: ", Date.now() - startTime);
+}
+
+async function fullBuild() {
+  let startTime = Date.now();
+  const filesToTranspile = collectFiles(join(process.cwd(), 'src'));
+  await Promise.all([
+    performESBuild(filesToTranspile),
+    validateTSC()
+  ]);
+  console.log("Full build time: ", Date.now() - startTime);
+}
+
+async function performESBuild(filesToTranspile) {
   await esbuild.build({
     entryPoints: filesToTranspile,
     bundle: false,
@@ -150,29 +145,24 @@ async function performESBuild(filesToTranspile) {
     format: 'cjs',
     plugins: [
       copy({
-        // this is equal to process.cwd(), which means we use cwd path as base path to resolve `to` path
-        // if not specified, this plugin uses ESBuild.build outdir/outfile options as base path.
         resolveFrom: 'cwd',
         assets: {
-          from: [args[1] + '/**/*.json'],
-          to: ['./lib'],
+          from: ['src/**/*.json'],
+          to: ['./lib']
         },
-        watch: true,
+        watch: true
       })
     ]
-  })
+  });
 }
 
-async function validateTSC(st) {
-  await execProcess(
-    'tsc',
-    'validate',
-    [
-      '-pretty',
-      "--emitDeclarationOnly",
-      "--incremental",
-      "--tsBuildInfoFile", ".validate/tsBuildInfoFile.info",
-      ...args.splice(1)
-    ], '.validate')
+async function validateTSC() {
+  let startTime = Date.now();
+  await execProcess('tsc', 'validate', [
+    '-pretty',
+    '--emitDeclarationOnly',
+    '--incremental',
+    '--tsBuildInfoFile', '.validate/tsBuildInfoFile.info'
+  ], '.validate');
+  console.log("Validate time: ", Date.now() - startTime);
 }
-
