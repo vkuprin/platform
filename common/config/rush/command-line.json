@@ -34,14 +34,6 @@
       "allowWarningsOnSuccess": true
     },
     {
-      "name": "_phase:lint",
-      "dependencies": {
-        "self": ["_phase:build"]
-      },
-      "ignoreMissingScript": true,
-      "allowWarningsOnSuccess": false
-    },
-    {
       "name": "_phase:bundle",
       "dependencies": {
         "self": ["_phase:build"]
@@ -56,6 +48,11 @@
       },
       "ignoreMissingScript": true,
       "allowWarningsOnSuccess": true
+    },
+    {
+      "name": "_phase:lint",
+      "ignoreMissingScript": true,
+      "allowWarningsOnSuccess": false
     },
     {
       "name": "_phase:package",
@@ -119,6 +116,14 @@
       "incremental": true
     },
     {
+      "summary": "lint",
+      "commandKind": "phased",
+      "name": "lint",
+      "phases": ["_phase:lint"],
+      "enableParallelism": true,
+      "incremental": true
+    },
+    {
       "commandKind": "phased",
       "name": "build",
       "summary": "build",
@@ -133,14 +138,6 @@
       "summary": "validate",
       "enableParallelism": true,
       "incremental": true      
-    },
-    {
-      "commandKind": "phased",
-      "name": "lint",
-      "summary": "Perform linting across all projects",
-      "phases": ["_phase:lint"],
-      "enableParallelism": true,
-      "incremental": true
     },
     {
       "commandKind": "phased",
@@ -243,7 +240,7 @@
       "description": "Clean typescript incremental cache",
       "safeForSimultaneousRushProcesses": true,
       "shellCommand": "find .|grep tsconfig.tsbuildinfo | xargs rm | pwd"
-    },    
+    },
     {
       "commandKind": "global",
       "name": "model-version",

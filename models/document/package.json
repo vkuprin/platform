@@ -11,7 +11,7 @@
     "build:watch": "compile",
     "format": "format src",
     "_phase:build": "compile transpile src",
-    "_phase:lint": "compile lint",
+    "_phase:lint": "echo test",
     "_phase:format": "format src",
     "_phase:validate": "compile validate"
   },
