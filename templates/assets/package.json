@@ -5,6 +5,7 @@
   "#overrideKeys": ["main"],
   "scripts": {
     "_phase:build": "compile transpile src",
+    "_phase:lint": "compile lint",
     "_phase:validate": "compile validate",
     "_phase:test": "jest --passWithNoTests --silent",
     "_phase:format": "format src",

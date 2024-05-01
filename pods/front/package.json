@@ -24,6 +24,7 @@
     "run-local": "cross-env MINIO_ACCESS_KEY=minioadmin MINIO_SECRET_KEY=minioadmin MINIO_ENDPOINT=localhost TRANSACTOR_URL=ws://localhost:3333 SERVER_SECRET='secret' ACCOUNTS_URL=http://localhost:3000 UPLOAD_URL=/files ELASTIC_URL=http://localhost:9200 MODEL_VERSION=$(node ../../common/scripts/show_version.js) PUBLIC_DIR='.' ts-node ./src/__start.ts",
     "test": "jest --passWithNoTests --silent --forceExit",
     "_phase:build": "compile transpile src",
+    "_phase:lint": "compile lint",
     "_phase:test": "jest --passWithNoTests --silent --forceExit",
     "_phase:format": "format src",
     "_phase:validate": "compile validate"

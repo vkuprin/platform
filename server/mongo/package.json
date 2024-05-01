@@ -13,6 +13,7 @@
     "test": "jest --passWithNoTests --silent --forceExit",
     "format": "format src",
     "_phase:build": "compile transpile src",
+    "_phase:lint": "compile lint",
     "_phase:test": "jest --passWithNoTests --silent --forceExit",
     "_phase:format": "format src",
     "_phase:validate": "compile validate"
